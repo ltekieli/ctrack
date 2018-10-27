@@ -106,6 +106,11 @@ int main(int argc, const char* argv[])
         }
         else if ("test" == command)
         {
+            auto result = handle_build_target(ap, "all");
+            if (result != 0)
+            {
+                return result;
+            }
             return handle_build_target(ap, "test");
         }
         else if ("clean" == command)
