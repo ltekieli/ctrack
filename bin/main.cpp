@@ -24,26 +24,32 @@ constexpr auto default_config = "default";
 constexpr auto ctrack_file_name = ".ctrack";
 constexpr auto param_config = "--config";
 
-std::string get_project_name() {
+std::string get_project_name()
+{
     return std::filesystem::current_path().filename().string();
 }
 
-std::filesystem::path get_build_path(const std::string& project_name, const std::string& config) {
-    if (std::filesystem::current_path() != std::filesystem::path("/")) {
+std::filesystem::path get_build_path(const std::string& project_name, const std::string& config)
+{
+    if (std::filesystem::current_path() != std::filesystem::path("/"))
+    {
         auto build_dir = ctrack::concatenate(project_name, "build", config);
         return std::filesystem::current_path().parent_path().append(build_dir);
     }
     throw std::runtime_error("Called from root directory");
 }
 
-std::string get_config_name(ctrack::arg_parser& ap) {
+std::string get_config_name(ctrack::arg_parser& ap)
+{
     std::string config(default_config);
-    if (ap.contains(param_config)) {
+    if (ap.contains(param_config))
+    {
         config = ap.get_value(param_config);
         std::fstream config_file(ctrack_file_name, std::fstream::out);
         config_file << config;
     }
-    else {
+    else
+    {
         std::ifstream config_file(ctrack_file_name);
         if (config_file.good())
             config_file >> config;
@@ -51,7 +57,8 @@ std::string get_config_name(ctrack::arg_parser& ap) {
     return config;
 }
 
-int handle_init(ctrack::arg_parser& ap) {
+int handle_init(ctrack::arg_parser& ap)
+{
     auto config = get_config_name(ap);
     auto project_name = get_project_name();
     auto build_path = get_build_path(project_name, config);
@@ -65,47 +72,58 @@ int handle_init(ctrack::arg_parser& ap) {
     return ctrack::run(argv);
 }
 
-int handle_build_target(ctrack::arg_parser& ap, std::string target) {
+int handle_build_target(ctrack::arg_parser& ap, std::string target)
+{
     auto config = get_config_name(ap);
     auto project_name = get_project_name();
     auto build_path = get_build_path(project_name, config);
 
-    if (!std::filesystem::exists(build_path)) {
+    if (!std::filesystem::exists(build_path))
+    {
         throw std::runtime_error("Given config does not exist");
     }
 
-    std::vector<std::string> argv = {
-        "cmake",
-        "--build",
-        build_path.string(),
-        "--target",
-        target
-    };
+    std::vector<std::string> argv = {"cmake", "--build", build_path.string(), "--target", target};
     const auto& args_pos = ap.positional_arguments();
     std::copy(args_pos.begin(), args_pos.end(), std::back_inserter(argv));
     return ctrack::run(argv);
 }
 
-int main(int argc, const char* argv[]) {
-    try {
+int main(int argc, const char* argv[])
+{
+    try
+    {
         ctrack::arg_parser ap(argc, argv);
         ap.parse();
         auto command = ap.command();
-        if ("init" == command) {
+        if ("init" == command)
+        {
             handle_init(ap);
-        } else if ("build" == command) {
+        }
+        else if ("build" == command)
+        {
             return handle_build_target(ap, "all");
-        } else if ("test" == command) {
+        }
+        else if ("test" == command)
+        {
             return handle_build_target(ap, "test");
-        } else if ("clean" == command) {
+        }
+        else if ("clean" == command)
+        {
             return handle_build_target(ap, "clean");
-        } else if ("install" == command) {
+        }
+        else if ("install" == command)
+        {
             return handle_build_target(ap, "install");
-        } else {
+        }
+        else
+        {
             std::cerr << "ERROR: Unrecognized command: " << command << std::endl;
             return 1;
         }
-    } catch (std::runtime_error& e) {
+    }
+    catch (std::runtime_error& e)
+    {
         std::cerr << "ERROR: " << e.what() << std::endl;
         return 1;
     }

@@ -7,9 +7,11 @@
 
 #include "error.h"
 
-namespace ctrack {
+namespace ctrack
+{
 
-class arg_parser {
+class arg_parser
+{
 public:
     using parameter = std::string;
     using value = std::string;
@@ -39,4 +41,4 @@ private:
     std::map<parameter, values> m_tokens;
 };
 
-}  // namespace ctrack
+} // namespace ctrack
