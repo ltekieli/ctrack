@@ -24,6 +24,21 @@ constexpr auto default_config = "default";
 constexpr auto ctrack_file_name = ".ctrack";
 constexpr auto param_config = "--config";
 
+constexpr auto help_message = R"(
+Usage: ctrack <command> <options> -- <cmake options>
+
+Available commands:
+  init      Initializes cmake build directory
+  build     Executes build
+  test      Executes tests
+  clean     Cleans build directory
+  install   Executes install
+  help      Prints this help message
+
+Common options:
+  --config <name>       Configuration to init or build/test/clean/install
+)";
+
 std::string get_project_name()
 {
     return std::filesystem::current_path().filename().string();
@@ -121,15 +136,21 @@ int main(int argc, const char* argv[])
         {
             return handle_build_target(ap, "install");
         }
+        else if ("help" == command)
+        {
+            std::cout << help_message << std::endl;
+        }
         else
         {
             std::cerr << "ERROR: Unrecognized command: " << command << std::endl;
+            std::cerr << help_message << std::endl;
             return 1;
         }
     }
     catch (std::runtime_error& e)
     {
         std::cerr << "ERROR: " << e.what() << std::endl;
+        std::cerr << help_message << std::endl;
         return 1;
     }
     return 0;
